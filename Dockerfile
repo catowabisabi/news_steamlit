@@ -1,30 +1,27 @@
-# 使用官方Python 3.11基礎鏡像
-FROM python:3.11-slim
+# 使用官方Python 3.11基礎鏡像（bullseye）
+FROM python:3.11-slim-bullseye
 
-# 設置工作目錄
+# 工作目錄
 WORKDIR /app
 
-# 設置環境變數
+# 環境變數
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH=/home/appuser/.local/bin:$PATH
 
-# 安裝系統依賴和PDF生成工具
+# 安裝系統依賴和PDF生成工具（用 root）
 RUN apt-get update && apt-get install -y \
-    # 基本工具
     wget \
     curl \
     git \
     build-essential \
-    # wkhtmltopdf和依賴
     wkhtmltopdf \
     xvfb \
-    # 字體支持
     fonts-liberation \
     fonts-dejavu-core \
     fonts-noto-cjk \
     fonts-noto-cjk-extra \
     fonts-noto-color-emoji \
-    # 其他依賴
     libssl-dev \
     libffi-dev \
     libxml2-dev \
@@ -32,26 +29,24 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
     zlib1g-dev \
-    # 清理緩存
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 創建非root用戶
+# 創建非 root 用戶
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+
+# 切換到非 root
 USER appuser
 
-# 複製requirements文件
+# 複製 requirements
 COPY --chown=appuser:appuser requirements.txt .
 
-# 安裝Python依賴
+# 安裝 Python 依賴（user 安裝會放到 $HOME/.local/bin）
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # 複製應用代碼
 COPY --chown=appuser:appuser . .
-
-# 創建數據目錄
-RUN mkdir -p /app/data && chmod 755 /app/data
 
 # 暴露端口
 EXPOSE 8502

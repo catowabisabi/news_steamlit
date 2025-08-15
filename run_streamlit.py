@@ -18,6 +18,7 @@ from llms_chatgpt import ChatGPT
 from llms_deepseek import DeepSeek
 from config import NEWS_ANALYSIS_PROMPT, news_to_traditional_chinese_prompt, news_to_english_prompt, analysis_to_english_prompt, desc_to_chinese_prompt
 from zoneinfo import ZoneInfo
+from ig_post import IgPostCreator
 
 # 導入自定義處理函數
 from process_stock import process_single_stock
@@ -26,6 +27,7 @@ class StockAnalysisApp:
     def __init__(self):
         self.file_manager = FileManager()
         self.today_str = datetime.now().strftime('%Y-%m-%d')
+        self.ig_creator = IgPostCreator()
         print(f"🗓️ Streamlit應用使用日期: {self.today_str}")  # 調試信息
         
     def clean_symbol_list(self, symbols_input: str) -> list:
@@ -361,9 +363,16 @@ class StockAnalysisApp:
         if data.get('desc_cn'):
             desc_cn_data = data['desc_cn'].get('data', {}) if isinstance(data['desc_cn'], dict) else data['desc_cn']
             if isinstance(desc_cn_data, dict) and 'desc_cn' in desc_cn_data:
-                md_content += f"<strong>公司描述:</strong> {desc_cn_data['desc_cn']}\n\n"
+                # 確保描述不包含新聞內容 (基本檢查)
+                desc_text = desc_cn_data['desc_cn']
+                if isinstance(desc_text, str) and len(desc_text.strip()) > 0:
+                    md_content += f"<strong>公司描述:</strong> {desc_text}\n\n"
+                else:
+                    md_content += "❌ 沒有公司介紹\n\n"
+            else:
+                md_content += "❌ 沒有公司介紹\n\n"
         else:
-            md_content += "❌ 暫無公司描述資料\n\n"
+            md_content += "❌ 沒有公司介紹\n\n"
 
         md_content += """---
 
@@ -508,14 +517,21 @@ class StockAnalysisApp:
         if data.get('desc_en'):
             desc_en_data = data['desc_en'].get('data', {}) if isinstance(data['desc_en'], dict) else data['desc_en']
             if isinstance(desc_en_data, dict):
+                desc_text = None
                 if 'desc_en' in desc_en_data:
-                    md_content += f"<strong>Company Description:</strong> {desc_en_data['desc_en']}\n\n"
+                    desc_text = desc_en_data['desc_en']
                 elif 'desc_en' in data['desc_en']:  # 直接在根級別
-                    md_content += f"<strong>Company Description:</strong> {data['desc_en']['desc_en']}\n\n"
+                    desc_text = data['desc_en']['desc_en']
+                
+                # 確保描述不包含新聞內容 (基本檢查)
+                if desc_text and isinstance(desc_text, str) and len(desc_text.strip()) > 0:
+                    md_content += f"<strong>Company Description:</strong> {desc_text}\n\n"
+                else:
+                    md_content += "❌ Company Description Not Available\n\n"
             else:
-                md_content += "❌ No company description available\n\n"
+                md_content += "❌ Company Description Not Available\n\n"
         else:
-            md_content += "❌ No company description available\n\n"
+            md_content += "❌ Company Description Not Available\n\n"
 
         md_content += """---
 
@@ -651,8 +667,8 @@ class StockAnalysisApp:
             dict: 處理結果
         """
         import time
-        from mongo_db import MongoDB
-        from get_news import get_news
+        from mongo_db import MongoHandler
+        from get_news import NewsScraper
         from llms_deepseek import DeepSeek
         from llms_chatgpt import ChatGPT
         from get_company_desc import CompanyDescScraper
@@ -661,19 +677,23 @@ class StockAnalysisApp:
             # 步驟1: 連接數據庫
             self._add_log(log_messages, log_container, "📊 連接MongoDB數據庫...")
             progress_bar.progress(0.15)
-            mongo = MongoDB()
+            mongo = MongoHandler()
             
             # 步驟2: 獲取新聞數據
             self._add_log(log_messages, log_container, f"📰 獲取 {symbol} 新聞數據...")
             progress_bar.progress(0.25)
             
             if not self.file_manager.file_exists(symbol, 'news', self.today_str) or force_refresh:
-                news = get_news(symbol)
-                if news and not news.get('error'):
-                    self.file_manager.save_data(symbol, news, 'news', self.today_str)
-                    self._add_log(log_messages, log_container, f"✅ {symbol} 新聞數據獲取成功")
-                else:
-                    self._add_log(log_messages, log_container, f"⚠️ {symbol} 新聞數據獲取失敗")
+                news_scraper = NewsScraper()
+                try:
+                    news = news_scraper.get_news(stock_ticker=symbol)
+                    if news and not news.get('error'):
+                        self.file_manager.save_data(symbol, 'news', news, self.today_str)
+                        self._add_log(log_messages, log_container, f"✅ {symbol} 新聞數據獲取成功")
+                    else:
+                        self._add_log(log_messages, log_container, f"⚠️ {symbol} 新聞數據獲取失敗")
+                finally:
+                    news_scraper.close()
             else:
                 self._add_log(log_messages, log_container, f"✅ news 數據已從緩存加載")
             
@@ -690,7 +710,7 @@ class StockAnalysisApp:
                         self._add_log(log_messages, log_container, f"❌ 錯誤：股票代碼不匹配 (期望: {symbol.upper()}, 實際: {ticker_in_data})")
                         return {"success": False, "error": "股票代碼不匹配"}
                     
-                    self.file_manager.save_data(symbol, fundamentals, 'fundamentals', self.today_str)
+                    self.file_manager.save_data(symbol, 'fundamentals', fundamentals, self.today_str)
                     self._add_log(log_messages, log_container, f"✅ {symbol} 基本面數據獲取成功")
                 else:
                     self._add_log(log_messages, log_container, f"❌ 暫無基本面資料")
@@ -706,7 +726,7 @@ class StockAnalysisApp:
                 desc_en = scraper.get_company_description(symbol, region='ca')
                 if desc_en:
                     desc_data = {"desc_en": desc_en}
-                    self.file_manager.save_data(symbol, desc_data, 'desc_en', self.today_str)
+                    self.file_manager.save_data(symbol, 'desc_en', desc_data, self.today_str)
                     self._add_log(log_messages, log_container, f"✅ {symbol} 公司描述獲取成功")
                 else:
                     self._add_log(log_messages, log_container, f"⚠️ {symbol} 公司描述獲取失敗")
@@ -721,10 +741,21 @@ class StockAnalysisApp:
             if not self.file_manager.file_exists(symbol, 'desc_cn', self.today_str) or force_refresh:
                 desc_en_data = self.file_manager.load_data(symbol, 'desc_en', self.today_str)
                 if desc_en_data:
+                    # 提取實際的英文描述文本
+                    if isinstance(desc_en_data, dict):
+                        if 'desc_en' in desc_en_data:
+                            desc_en_text = desc_en_data['desc_en']
+                        elif 'data' in desc_en_data:
+                            desc_en_text = desc_en_data['data']
+                        else:
+                            desc_en_text = str(desc_en_data)
+                    else:
+                        desc_en_text = str(desc_en_data)
+                    
                     chatgpt = ChatGPT()
-                    desc_cn_result = chatgpt.chat(desc_en_data, desc_to_chinese_prompt, json_output=True)
+                    desc_cn_result = chatgpt.chat(desc_en_text, custom_system_prompt=desc_to_chinese_prompt, json_output=True)
                     if desc_cn_result:
-                        self.file_manager.save_data(symbol, desc_cn_result, 'desc_cn', self.today_str)
+                        self.file_manager.save_data(symbol, 'desc_cn', desc_cn_result, self.today_str)
                         self._add_log(log_messages, log_container, f"✅ {symbol} 公司描述翻譯成功!")
                     else:
                         self._add_log(log_messages, log_container, f"⚠️ {symbol} 公司描述翻譯失敗")
@@ -733,14 +764,37 @@ class StockAnalysisApp:
             else:
                 self._add_log(log_messages, log_container, f"✅ desc_cn 數據已從緩存加載")
             
+            print("DEBUG: About to set progress to 0.7")  # 調試輸出
             progress_bar.progress(0.7)
+            print("DEBUG: Progress set to 0.7")  # 調試輸出
             
-            # 步驟6: 其他翻譯和分析處理...
-            self._add_log(log_messages, log_container, f"🔄 進行其他數據處理...")
-            time.sleep(1)  # 模擬處理時間
+            # 步驟6: 執行實際的數據處理（新聞分析、翻譯等）
+            print("DEBUG: About to add log for step 6")  # 調試輸出
+            self._add_log(log_messages, log_container, f"🔄 進行新聞分析和翻譯處理...")
+            print("DEBUG: Log added for step 6")  # 調試輸出
+            
+            # 調用實際的處理邏輯
+            try:
+                from process_stock import process_single_stock
+                processing_result = process_single_stock(symbol, force_refresh=force_refresh)
+                
+                if processing_result.get("success", False):
+                    self._add_log(log_messages, log_container, f"✅ {symbol} 新聞分析和翻譯完成!")
+                else:
+                    error_msgs = processing_result.get("errors", [])
+                    for error in error_msgs[:3]:  # 只顯示前3個錯誤
+                        self._add_log(log_messages, log_container, f"⚠️ {error}")
+                    
+            except Exception as e:
+                self._add_log(log_messages, log_container, f"⚠️ 數據處理出現問題: {str(e)}")
+                print(f"DEBUG: Processing error: {e}")
+            
+            print("DEBUG: Processing completed")  # 調試輸出
             
             progress_bar.progress(0.9)
+            print("DEBUG: Progress set to 0.9")  # 調試輸出
             self._add_log(log_messages, log_container, f"🎉 {symbol} 所有數據處理完成!")
+            print("DEBUG: Final log added")  # 調試輸出
             
             return {"success": True}
             
@@ -751,10 +805,14 @@ class StockAnalysisApp:
     def _add_log(self, log_messages: list, log_container, message: str):
         """添加日誌消息並更新顯示"""
         import time
+        print(f"LOG: {message}")  # 添加調試輸出
         log_messages.append(f"{message}")
         log_text = "\n".join(log_messages[-10:])  # 只顯示最近10條消息
-        log_container.text_area("處理日誌", log_text, height=200, disabled=True)
-        time.sleep(0.1)  # 短暫延遲讓用戶看到更新
+        try:
+            log_container.text_area("處理日誌", log_text, height=200, disabled=True)
+            time.sleep(0.1)  # 短暫延遲讓用戶看到更新
+        except Exception as e:
+            print(f"LOG ERROR: {e}")  # 調試 UI 更新錯誤
 
     def generate_chinese_pdf_report_html(self, symbol: str, data: dict) -> str:
         """
@@ -2057,6 +2115,115 @@ class StockAnalysisApp:
             st.error(f"PDF轉換失敗: {e}")
             st.info("💡 建議：1) 安裝 wkhtmltopdf 2) 檢查系統字體支持")
             return None
+    
+    def generate_ig_post(self, symbol: str, data: dict) -> dict:
+        """
+        生成 Instagram 貼文
+        
+        Args:
+            symbol: 股票代碼
+            data: 股票數據
+            
+        Returns:
+            dict: Instagram 貼文結果
+        """
+        try:
+            # 生成中文報告內容作為基礎
+            report_content = self.generate_chinese_report_content(symbol, data)
+            
+            # 使用 IgPostCreator 生成 Instagram 貼文
+            result = self.ig_creator.create_ig_post(symbol, report_content)
+            
+            return result
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "symbol": symbol.upper()
+            }
+    
+    def save_ig_post(self, symbol: str, ig_result: dict) -> str:
+        """
+        保存 Instagram 貼文到文件
+        
+        Args:
+            symbol: 股票代碼
+            ig_result: Instagram 貼文結果
+            
+        Returns:
+            str: 保存的文件路徑
+        """
+        try:
+            # 創建數據目錄
+            data_path = Path(self.file_manager._get_data_path(symbol, self.today_str))
+            data_path.mkdir(parents=True, exist_ok=True)
+            
+            # 生成文件名
+            filename = data_path / f"{symbol}_ig_post_{self.today_str}.txt"
+            
+            # 保存內容
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write("=== INSTAGRAM POST ===\n\n")
+                f.write(ig_result['formatted_post'])
+                f.write(f"\n\n=== HASHTAGS ===\n\n")
+                f.write(ig_result['hashtags'])
+                f.write(f"\n\n=== RAW JSON ===\n\n")
+                f.write(json.dumps(ig_result['raw_json'], ensure_ascii=False, indent=2))
+            
+            return str(filename)
+            
+        except Exception as e:
+            raise Exception(f"保存 Instagram 貼文失敗: {str(e)}")
+    
+    def load_ig_post(self, symbol: str) -> dict:
+        """
+        載入已保存的 Instagram 貼文
+        
+        Args:
+            symbol: 股票代碼
+            
+        Returns:
+            dict: Instagram 貼文內容
+        """
+        try:
+            data_path = Path(self.file_manager._get_data_path(symbol, self.today_str))
+            filename = data_path / f"{symbol}_ig_post_{self.today_str}.txt"
+            
+            if filename.exists():
+                with open(filename, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    
+                # 解析文件內容
+                sections = content.split("=== ")
+                ig_post = ""
+                hashtags = ""
+                raw_json = {}
+                
+                for section in sections:
+                    if section.startswith("INSTAGRAM POST ==="):
+                        ig_post = section.replace("INSTAGRAM POST ===\n\n", "").split("\n\n=== ")[0]
+                    elif section.startswith("HASHTAGS ==="):
+                        hashtags = section.replace("HASHTAGS ===\n\n", "").split("\n\n=== ")[0]
+                    elif section.startswith("RAW JSON ==="):
+                        json_text = section.replace("RAW JSON ===\n\n", "")
+                        try:
+                            raw_json = json.loads(json_text)
+                        except:
+                            pass
+                
+                return {
+                    "exists": True,
+                    "formatted_post": ig_post.strip(),
+                    "hashtags": hashtags.strip(),
+                    "raw_json": raw_json,
+                    "filename": str(filename)
+                }
+            else:
+                return {"exists": False}
+                
+        except Exception as e:
+            return {"exists": False, "error": str(e)}
 
 def main():
     st.set_page_config(
@@ -2100,14 +2267,16 @@ def main():
                     # 載入數據
                     data = app.load_stock_data(symbol)
                     
-                    # 檢查數據完整性
-                    required_data = ['desc_en', 'desc_cn', 'news_cn', 'analysis', 'news_en', 'analysis_en']
+                    # 檢查數據完整性 - 公司描述為可選項
+                    required_data = ['news_cn', 'analysis', 'news_en', 'analysis_en']
+                    optional_data = ['desc_en', 'desc_cn']
                     missing_data = [dt for dt in required_data if not data.get(dt)]
+                    missing_optional = [dt for dt in optional_data if not data.get(dt)]
                     
                     if missing_data:
-                        st.warning(f"⚠️ {symbol} 缺少以下數據: {', '.join(missing_data)}")
+                        st.warning(f"⚠️ {symbol} 缺少以下必要數據: {', '.join(missing_data)}")
                         
-                        # 提供自動生成選項
+                        # 提供自動生成選項 (只有缺少必要數據時才提供)
                         if st.button(f"🔄 自動生成 {symbol} 的缺失數據", key=f"generate_{symbol}"):
                             # 創建進度顯示區域
                             with st.container():
@@ -2178,11 +2347,17 @@ def main():
                                     log_messages.append(f"❌ 處理過程出錯: {str(e)}")
                                     log_container.text_area("處理日誌", "\n".join(log_messages), height=200, disabled=True)
                                     st.error(f"❌ 處理過程出錯: {str(e)}")
-                                    for error in result["errors"]:
-                                        st.error(f"  - {error}")
+                                    # 修復：檢查 result 是否存在且有 errors 屬性
+                                    if 'result' in locals() and result and isinstance(result, dict) and "errors" in result:
+                                        for error in result["errors"]:
+                                            st.error(f"  - {error}")
                         
                         st.info("💡 或者運行命令: `python process_stock.py " + symbol + "`")
-                        continue
+                        continue  # 只有在缺少必要數據時才跳過報告生成
+                    
+                    # 顯示可選數據缺失信息（不阻止報告生成）
+                    if missing_optional:
+                        st.info(f"ℹ️ {symbol} 缺少以下可選數據（不影響報告生成）: {', '.join(missing_optional)}")
                     
                     # 顯示數據摘要
                     col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -2199,6 +2374,42 @@ def main():
                         st.metric("📊 中文分析", "✅" if data.get('analysis') else "❌")
                     with col6:
                         st.metric("📊 英文分析", "✅" if data.get('analysis_en') else "❌")
+                    
+                    # 添加重新下載新聞按鈕
+                    st.markdown("---")
+                    col_refresh1, col_refresh2 = st.columns([1, 3])
+                    
+                    with col_refresh1:
+                        if st.button(f"📰 重新下載 {symbol} 新聞", key=f"refresh_news_{symbol}", help="重新獲取新聞並重新處理所有數據"):
+                            with st.spinner(f"正在重新下載 {symbol} 的新聞並重新處理..."):
+                                try:
+                                    # 創建進度顯示
+                                    progress_container = st.container()
+                                    with progress_container:
+                                        progress_bar = st.progress(0)
+                                        status_text = st.empty()
+                                        log_container = st.empty()
+                                        log_messages = []
+                                        
+                                        # 調用處理函數，force_refresh=True 會重新下載所有數據
+                                        status_text.text(f"🔄 重新處理 {symbol} 所有數據...")
+                                        result = app.process_with_progress(symbol, log_messages, log_container, progress_bar, status_text, force_refresh=True)
+                                        
+                                        if result.get("success", False):
+                                            st.success(f"✅ {symbol} 新聞重新下載並處理完成!")
+                                            st.rerun()  # 重新加載頁面以顯示新數據
+                                        else:
+                                            st.error(f"❌ {symbol} 重新處理失敗")
+                                            if result.get("errors"):
+                                                for error in result["errors"]:
+                                                    st.error(f"  - {error}")
+                                except Exception as e:
+                                    st.error(f"❌ 重新處理過程出錯: {str(e)}")
+                    
+                    with col_refresh2:
+                        st.info("💡 此按鈕會重新下載新聞並重新處理所有數據（包括翻譯和分析）")
+                    
+                    st.markdown("---")
                     
                     # 生成或載入報告
                     if md_file_path.exists() and chinese_pdf_path.exists() and english_pdf_path.exists():
@@ -2396,6 +2607,96 @@ def main():
                                         st.rerun()
                                     else:
                                         st.error("❌ PDF重新生成失敗，請檢查依賴")
+                    
+                    # Instagram 貼文功能
+                    st.markdown("---")
+                    st.markdown("### 📱 Instagram 投資貼文")
+                    
+                    # 檢查是否已有 IG 貼文
+                    ig_post_data = app.load_ig_post(symbol)
+                    
+                    if ig_post_data.get("exists"):
+                        st.success("✅ 發現現有 Instagram 貼文")
+                        
+                        # 顯示貼文內容
+                        ig_tab1, ig_tab2 = st.tabs(["📱 Instagram 貼文", "🏷️ Hashtags"])
+                        
+                        with ig_tab1:
+                            st.text_area(
+                                "Instagram 貼文內容",
+                                value=ig_post_data["formatted_post"],
+                                height=400,
+                                disabled=True
+                            )
+                        
+                        with ig_tab2:
+                            st.text_area(
+                                "Hashtags",
+                                value=ig_post_data["hashtags"],
+                                height=100,
+                                disabled=True
+                            )
+                        
+                        # IG 貼文操作按鈕
+                        ig_col1, ig_col2, ig_col3 = st.columns(3)
+                        
+                        with ig_col1:
+                            # 下載 IG 貼文
+                            if st.download_button(
+                                label="📱 下載 IG 貼文",
+                                data=ig_post_data["formatted_post"] + "\n\n" + ig_post_data["hashtags"],
+                                file_name=f"{symbol}_ig_post_{app.today_str}.txt",
+                                mime="text/plain"
+                            ):
+                                st.success("✅ IG 貼文下載完成!")
+                        
+                        with ig_col2:
+                            # 重新生成 IG 貼文
+                            if st.button(f"🔄 重新生成 IG 貼文", key=f"regenerate_ig_{symbol}"):
+                                with st.spinner("正在重新生成 Instagram 貼文..."):
+                                    try:
+                                        ig_result = app.generate_ig_post(symbol, data)
+                                        
+                                        if ig_result["success"]:
+                                            # 保存新的 IG 貼文
+                                            filename = app.save_ig_post(symbol, ig_result)
+                                            st.success("✅ Instagram 貼文重新生成完成!")
+                                            st.rerun()
+                                        else:
+                                            st.error(f"❌ 生成失敗: {ig_result.get('error', '未知錯誤')}")
+                                    except Exception as e:
+                                        st.error(f"❌ 重新生成過程出錯: {str(e)}")
+                        
+                        with ig_col3:
+                            # 查看原始 JSON
+                            if st.button("🔍 查看原始數據", key=f"view_ig_json_{symbol}"):
+                                if ig_post_data.get("raw_json"):
+                                    st.json(ig_post_data["raw_json"])
+                                else:
+                                    st.warning("⚠️ 無原始 JSON 數據")
+                    
+                    else:
+                        # 自動生成 IG 貼文（當報告存在時）
+                        if md_file_path.exists():
+                            st.info("📱 檢測到報告已生成，可以創建 Instagram 貼文")
+                            
+                            if st.button(f"🎨 生成 {symbol} Instagram 貼文", key=f"create_ig_{symbol}"):
+                                with st.spinner("正在生成 Instagram 貼文..."):
+                                    try:
+                                        ig_result = app.generate_ig_post(symbol, data)
+                                        
+                                        if ig_result["success"]:
+                                            # 保存 IG 貼文
+                                            filename = app.save_ig_post(symbol, ig_result)
+                                            st.success("✅ Instagram 貼文生成完成!")
+                                            st.rerun()
+                                        else:
+                                            st.error(f"❌ 生成失敗: {ig_result.get('error', '未知錯誤')}")
+                                    except Exception as e:
+                                        st.error(f"❌ 生成過程出錯: {str(e)}")
+                        else:
+                            st.warning("⚠️ 請先生成股票分析報告，然後才能創建 Instagram 貼文")
+        
         else:
             st.error("❌ 未識別到有效的股票代碼")
     

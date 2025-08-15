@@ -32,11 +32,25 @@ class NewsScraper:
             else:
                 url = self.base_url
                 
-            # Make the request
-            response = self.session.get(url, timeout=30)
-            response.raise_for_status()  # Raises an HTTPError for bad responses
-            
-            return response.json()
+            # Make the request with retry logic
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # Increase timeout to 300 seconds (5 minutes) and add headers
+                    response = self.session.get(url, timeout=300, headers={
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    })
+                    response.raise_for_status()  # Raises an HTTPError for bad responses
+                    
+                    return response.json()
+                except requests.exceptions.Timeout as e:
+                    print(f"Timeout on attempt {attempt + 1}/{max_retries}: {e}")
+                    if attempt == max_retries - 1:
+                        raise
+                except requests.exceptions.RequestException as e:
+                    print(f"Request error on attempt {attempt + 1}/{max_retries}: {e}")
+                    if attempt == max_retries - 1:
+                        raise
             
         except requests.exceptions.RequestException as e:
             print(f"Error fetching news: {e}")

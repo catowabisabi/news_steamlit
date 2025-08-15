@@ -225,6 +225,68 @@ class MongoHandler:
         except Exception as e:
             print(f"Delete one error: {e}")
             return None
+    
+    #region Get Fundamentals
+    def get_fundamentals(self, symbol):
+        """獲取股票基本面數據"""
+        if not self.is_connected():
+            return None
+        
+        try:
+            # 使用今天的日期查詢
+            today_str = datetime.now(ZoneInfo("America/New_York")).strftime('%Y-%m-%d')
+            
+            # 查詢基本面數據
+            fundamentals = self.find_one(
+                "fundamentals_of_top_list_symbols", 
+                {
+                    "symbol": symbol.upper(),
+                    "today_date": today_str
+                }
+            )
+            
+            if fundamentals:
+                # 移除圖表數據以減少大小
+                fundamentals.pop("1d_chart_data", None)
+                fundamentals.pop("1m_chart_data", None)
+                fundamentals.pop("5m_chart_data", None)
+                # 移除 MongoDB 特定字段
+                fundamentals.pop("_id", None)
+                fundamentals.pop("updated_at", None)
+                fundamentals.pop("created_at", None)
+                
+                # 處理可能包含 datetime 的字段
+                for key, value in list(fundamentals.items()):
+                    if hasattr(value, 'isoformat'):  # datetime 對象
+                        fundamentals[key] = value.isoformat()
+                    elif isinstance(value, dict):
+                        # 遞歸處理嵌套的字典
+                        fundamentals[key] = self._clean_datetime_fields(value)
+                
+                return fundamentals
+            else:
+                print(f"No fundamentals data found for symbol '{symbol}' on {today_str}")
+                return None
+                
+        except Exception as e:
+            print(f"Get fundamentals error: {e}")
+            return None
+    
+    def _clean_datetime_fields(self, data):
+        """遞歸清理字典中的 datetime 字段"""
+        if isinstance(data, dict):
+            cleaned = {}
+            for key, value in data.items():
+                if hasattr(value, 'isoformat'):  # datetime 對象
+                    cleaned[key] = value.isoformat()
+                elif isinstance(value, dict):
+                    cleaned[key] = self._clean_datetime_fields(value)
+                elif isinstance(value, list):
+                    cleaned[key] = [self._clean_datetime_fields(item) if isinstance(item, dict) else item for item in value]
+                else:
+                    cleaned[key] = value
+            return cleaned
+        return data
         
 if __name__ == "__main__":
     # 初始化 MongoDB handler

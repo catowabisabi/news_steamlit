@@ -229,6 +229,15 @@ class FileManager:
             print(f"✅ {data_type} 數據已從緩存加載: {file_path}")
             return data
             
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON 解析錯誤: {e}")
+            print(f"🗑️ 刪除損壞的文件: {file_path}")
+            try:
+                file_path.unlink()  # 刪除損壞的文件
+                print(f"✅ 已刪除損壞的文件，將重新獲取數據")
+            except Exception as delete_error:
+                print(f"⚠️ 無法刪除損壞的文件: {delete_error}")
+            return None
         except Exception as e:
             print(f"❌ 加載 {data_type} 數據失敗: {e}")
             return None

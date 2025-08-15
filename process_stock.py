@@ -290,14 +290,22 @@ def process_single_stock(symbol: str, force_refresh: bool = False) -> dict:
             except Exception as e:
                 result["errors"].append(f"英文分析翻譯失敗: {e}")
         
-        # 檢查所有數據是否完整
-        all_complete = all(result["data_status"].values())
-        result["success"] = all_complete
+        # 檢查所有數據是否完整 - 公司描述為可選項
+        required_data_types = ['news', 'fundamentals', 'news_cn', 'analysis', 'news_en', 'analysis_en'] 
+        optional_data_types = ['desc_en', 'desc_cn']
         
-        if all_complete:
-            print(f"🎉 {symbol} 所有數據處理完成!")
+        required_complete = all(result["data_status"].get(dt, False) for dt in required_data_types)
+        result["success"] = required_complete
+        
+        if required_complete:
+            print(f"🎉 {symbol} 所有必要數據處理完成!")
+            # 檢查可選數據
+            missing_optional = [dt for dt in optional_data_types if not result["data_status"].get(dt, False)]
+            if missing_optional:
+                print(f"ℹ️ {symbol} 缺少可選數據: {', '.join(missing_optional)} (不影響分析)")
         else:
-            print(f"⚠️ {symbol} 部分數據處理失敗")
+            missing_required = [dt for dt in required_data_types if not result["data_status"].get(dt, False)]
+            print(f"⚠️ {symbol} 缺少必要數據: {', '.join(missing_required)}")
         
         return result
         
