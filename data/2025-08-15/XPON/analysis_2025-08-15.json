@@ -1,0 +1,42 @@
+{
+  "data": {
+    "company": "XPON",
+    "ticker": "XPON",
+    "quarter": "未知",
+    "positive_factors": [
+      {
+        "title": "數據缺失",
+        "detail": "無可用新聞稿或財務數據來識別任何利好因素，無法分析影響股價的正面驅動因素。"
+      }
+    ],
+    "risks": [
+      {
+        "title": "數據缺失風險",
+        "detail": "新聞稿內容為空且財務數據不存在，導致投資評估高度不確定，可能增加股價波動風險和決策失誤。"
+      }
+    ],
+    "liquidity_risk": {
+      "cash": "未知",
+      "burn_rate": "未知",
+      "atm_risk": "未知",
+      "debt_status": "未知"
+    },
+    "summary": {
+      "short_term": "無法判斷",
+      "mid_term": "無法判斷",
+      "long_term": "無法判斷"
+    },
+    "trading_recommendation": {
+      "bias": "中性",
+      "suggestion": "避免任何交易決策，建議等待公司發布正式財報或新聞後再評估；監控市場動態以獲取更多資訊。",
+      "catalysts": [
+        "潛在財報發布",
+        "公司公告更新"
+      ]
+    }
+  },
+  "raw_text": "{\n  \"company\": \"XPON\",\n  \"ticker\": \"XPON\",\n  \"quarter\": \"未知\",\n  \"positive_factors\": [\n    {\n      \"title\": \"數據缺失\",\n      \"detail\": \"無可用新聞稿或財務數據來識別任何利好因素，無法分析影響股價的正面驅動因素。\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"title\": \"數據缺失風險\",\n      \"detail\": \"新聞稿內容為空且財務數據不存在，導致投資評估高度不確定，可能增加股價波動風險和決策失誤。\"\n    }\n  ],\n  \"liquidity_risk\": {\n    \"cash\": \"未知\",\n    \"burn_rate\": \"未知\",\n    \"atm_risk\": \"未知\",\n    \"debt_status\": \"未知\"\n  },\n  \"summary\": {\n    \"short_term\": \"無法判斷\",\n    \"mid_term\": \"無法判斷\",\n    \"long_term\": \"無法判斷\"\n  },\n  \"trading_recommendation\": {\n    \"bias\": \"中性\",\n    \"suggestion\": \"避免任何交易決策，建議等待公司發布正式財報或新聞後再評估；監控市場動態以獲取更多資訊。\",\n    \"catalysts\": [\"潛在財報發布\", \"公司公告更新\"]\n  }\n}",
+  "timestamp": "2025-08-15T00:11:27.900636",
+  "symbol": "XPON",
+  "type": "analysis"
+}

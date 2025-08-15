@@ -1,0 +1,42 @@
+{
+  "data": {
+    "company": "Apple Inc.",
+    "ticker": "AAPL",
+    "quarter": "Unknown",
+    "positive_factors": [
+      {
+        "title": "Data Unavailable",
+        "detail": "The press release article is empty, making it impossible to identify any specific positive factors and thus assess their positive impact on the stock price."
+      }
+    ],
+    "risks": [
+      {
+        "title": "Missing Financial Data",
+        "detail": "The absence of fundamental data increases investment uncertainty and risk, which may lead to stock price volatility or misinformed investment decisions."
+      }
+    ],
+    "liquidity_risk": {
+      "cash": "Data Unavailable",
+      "burn_rate": "Data Unavailable",
+      "atm_risk": "Unknown",
+      "debt_status": "Data Unavailable"
+    },
+    "summary": {
+      "short_term": "Due to the lack of data, short-term stock prices may remain at current levels or fluctuate slightly, lacking a clear direction.",
+      "mid_term": "More information is needed; mid-term trends are difficult to predict and may be dominated by market sentiment.",
+      "long_term": "Long-term investment outlook depends on future fundamental data, but it cannot be assessed at this time."
+    },
+    "trading_recommendation": {
+      "bias": "Neutral",
+      "suggestion": "Investors are advised to delay trading until official financial reports or news updates are released for a reassessment of entry timing.",
+      "catalysts": [
+        "Release of financial data",
+        "Market news updates"
+      ]
+    }
+  },
+  "raw_text": "{\n  \"company\": \"Apple Inc.\",\n  \"ticker\": \"AAPL\",\n  \"quarter\": \"Unknown\",\n  \"positive_factors\": [\n    {\n      \"title\": \"Data Unavailable\",\n      \"detail\": \"The press release article is empty, making it impossible to identify any specific positive factors and thus assess their positive impact on the stock price.\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"title\": \"Missing Financial Data\",\n      \"detail\": \"The absence of fundamental data increases investment uncertainty and risk, which may lead to stock price volatility or misinformed investment decisions.\"\n    }\n  ],\n  \"liquidity_risk\": {\n    \"cash\": \"Data Unavailable\",\n    \"burn_rate\": \"Data Unavailable\",\n    \"atm_risk\": \"Unknown\",\n    \"debt_status\": \"Data Unavailable\"\n  },\n  \"summary\": {\n    \"short_term\": \"Due to the lack of data, short-term stock prices may remain at current levels or fluctuate slightly, lacking a clear direction.\",\n    \"mid_term\": \"More information is needed; mid-term trends are difficult to predict and may be dominated by market sentiment.\",\n    \"long_term\": \"Long-term investment outlook depends on future fundamental data, but it cannot be assessed at this time.\"\n  },\n  \"trading_recommendation\": {\n    \"bias\": \"Neutral\",\n    \"suggestion\": \"Investors are advised to delay trading until official financial reports or news updates are released for a reassessment of entry timing.\",\n    \"catalysts\": [\n      \"Release of financial data\",\n      \"Market news updates\"\n    ]\n  }\n}",
+  "timestamp": "2025-08-14T23:59:06.625974",
+  "symbol": "AAPL",
+  "type": "analysis_en"
+}

@@ -1,0 +1,41 @@
+{
+  "data": {
+    "company": "Apple Inc.",
+    "ticker": "AAPL",
+    "quarter": "Not provided",
+    "positive_factors": [
+      {
+        "title": "Insufficient Information",
+        "detail": "No press releases or financial data provided, making it impossible to identify specific positive factors. Apple typically benefits from product innovation and market leadership, but based on the input, no positive factors impacting the stock price can be confirmed."
+      }
+    ],
+    "risks": [
+      {
+        "title": "Insufficient Information",
+        "detail": "No press releases or financial data provided, making it impossible to identify specific risk factors. Potential risks may include market volatility or regulatory changes, but based on the input, actual impacts cannot be assessed."
+      }
+    ],
+    "liquidity_risk": {
+      "cash": "Insufficient data to assess cash status and sustainability timeframe.",
+      "burn_rate": "Insufficient data to assess cash burn rate.",
+      "atm_risk": "Unknown",
+      "debt_status": "Insufficient data to assess debt status and repayment capability."
+    },
+    "summary": {
+      "short_term": "Insufficient data, short-term trend is uncertain and may be affected by market sentiment.",
+      "mid_term": "Insufficient data, medium-term trend is unclear and requires waiting for financial reports or news updates.",
+      "long_term": "Apple's long-term outlook is generally robust, but based on the input, specific investment value cannot be assessed."
+    },
+    "trading_recommendation": {
+      "bias": "Neutral",
+      "suggestion": "Due to lack of data, it is recommended to wait or monitor for the company to release financial reports and news; avoid large positions and monitor market dynamics.",
+      "catalysts": [
+        "No data provided; key events such as earnings releases or product announcements may impact stock price."
+      ]
+    }
+  },
+  "raw_text": "{\n  \"company\": \"Apple Inc.\",\n  \"ticker\": \"AAPL\",\n  \"quarter\": \"Not provided\",\n  \"positive_factors\": [\n    {\n      \"title\": \"Insufficient Information\",\n      \"detail\": \"No press releases or financial data provided, making it impossible to identify specific positive factors. Apple typically benefits from product innovation and market leadership, but based on the input, no positive factors impacting the stock price can be confirmed.\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"title\": \"Insufficient Information\",\n      \"detail\": \"No press releases or financial data provided, making it impossible to identify specific risk factors. Potential risks may include market volatility or regulatory changes, but based on the input, actual impacts cannot be assessed.\"\n    }\n  ],\n  \"liquidity_risk\": {\n    \"cash\": \"Insufficient data to assess cash status and sustainability timeframe.\",\n    \"burn_rate\": \"Insufficient data to assess cash burn rate.\",\n    \"atm_risk\": \"Unknown\",\n    \"debt_status\": \"Insufficient data to assess debt status and repayment capability.\"\n  },\n  \"summary\": {\n    \"short_term\": \"Insufficient data, short-term trend is uncertain and may be affected by market sentiment.\",\n    \"mid_term\": \"Insufficient data, medium-term trend is unclear and requires waiting for financial reports or news updates.\",\n    \"long_term\": \"Apple's long-term outlook is generally robust, but based on the input, specific investment value cannot be assessed.\"\n  },\n  \"trading_recommendation\": {\n    \"bias\": \"Neutral\",\n    \"suggestion\": \"Due to lack of data, it is recommended to wait or monitor for the company to release financial reports and news; avoid large positions and monitor market dynamics.\",\n    \"catalysts\": [\n      \"No data provided; key events such as earnings releases or product announcements may impact stock price.\"\n    ]\n  }\n}",
+  "timestamp": "2025-08-15T01:08:10.036868",
+  "symbol": "AAPL",
+  "type": "analysis_en"
+}

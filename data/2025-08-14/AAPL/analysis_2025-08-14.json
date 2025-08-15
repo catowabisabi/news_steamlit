@@ -1,0 +1,42 @@
+{
+  "data": {
+    "company": "蘋果公司",
+    "ticker": "AAPL",
+    "quarter": "未知",
+    "positive_factors": [
+      {
+        "title": "數據不可用",
+        "detail": "新聞稿文章為空，無法識別任何具體利好因素，因此無法評估對股價的正面影響"
+      }
+    ],
+    "risks": [
+      {
+        "title": "財務數據缺失",
+        "detail": "基本面資料不存在，增加投資不確定性和風險，可能導致股價波動或投資決策失誤"
+      }
+    ],
+    "liquidity_risk": {
+      "cash": "數據不可用",
+      "burn_rate": "數據不可用",
+      "atm_risk": "未知",
+      "debt_status": "數據不可用"
+    },
+    "summary": {
+      "short_term": "由於數據缺失，短期股價可能維持當前水平或小幅波動，缺乏明確方向",
+      "mid_term": "需等待更多資訊發布，中期走勢難以預測，可能受市場情緒主導",
+      "long_term": "長期投資前景取決於未來基本面數據，但目前無法評估"
+    },
+    "trading_recommendation": {
+      "bias": "中性",
+      "suggestion": "建議投資者暫緩交易，待官方財務報告或新聞更新後再評估入場時機",
+      "catalysts": [
+        "財務數據發布",
+        "市場新聞更新"
+      ]
+    }
+  },
+  "raw_text": "{\n  \"company\": \"蘋果公司\",\n  \"ticker\": \"AAPL\",\n  \"quarter\": \"未知\",\n  \"positive_factors\": [\n    {\n      \"title\": \"數據不可用\",\n      \"detail\": \"新聞稿文章為空，無法識別任何具體利好因素，因此無法評估對股價的正面影響\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"title\": \"財務數據缺失\",\n      \"detail\": \"基本面資料不存在，增加投資不確定性和風險，可能導致股價波動或投資決策失誤\"\n    }\n  ],\n  \"liquidity_risk\": {\n    \"cash\": \"數據不可用\",\n    \"burn_rate\": \"數據不可用\",\n    \"atm_risk\": \"未知\",\n    \"debt_status\": \"數據不可用\"\n  },\n  \"summary\": {\n    \"short_term\": \"由於數據缺失，短期股價可能維持當前水平或小幅波動，缺乏明確方向\",\n    \"mid_term\": \"需等待更多資訊發布，中期走勢難以預測，可能受市場情緒主導\",\n    \"long_term\": \"長期投資前景取決於未來基本面數據，但目前無法評估\"\n  },\n  \"trading_recommendation\": {\n    \"bias\": \"中性\",\n    \"suggestion\": \"建議投資者暫緩交易，待官方財務報告或新聞更新後再評估入場時機\",\n    \"catalysts\": [\"財務數據發布\", \"市場新聞更新\"]\n  }\n}",
+  "timestamp": "2025-08-14T23:59:00.641034",
+  "symbol": "AAPL",
+  "type": "analysis"
+}

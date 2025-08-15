@@ -1,0 +1,11 @@
+{
+  "data": {
+    "news_cn": "目前沒有相關的新聞稿可供翻譯。",
+    "summary": "目前沒有可用的財經新聞稿。",
+    "key_points": []
+  },
+  "raw_text": "{\n  \"news_cn\": \"目前沒有相關的新聞稿可供翻譯。\",\n  \"summary\": \"目前沒有可用的財經新聞稿。\",\n  \"key_points\": []\n}",
+  "timestamp": "2025-08-15T00:10:26.798573",
+  "symbol": "XPON",
+  "type": "news_cn"
+}

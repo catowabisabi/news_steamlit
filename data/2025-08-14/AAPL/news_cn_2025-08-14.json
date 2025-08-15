@@ -1,0 +1,11 @@
+{
+  "data": {
+    "news_cn": "目前沒有相關的新聞報導。",
+    "summary": "目前沒有針對蘋果公司（AAPL）的最新新聞。",
+    "key_points": []
+  },
+  "raw_text": "{\n  \"news_cn\": \"目前沒有相關的新聞報導。\",\n  \"summary\": \"目前沒有針對蘋果公司（AAPL）的最新新聞。\",\n  \"key_points\": []\n}",
+  "timestamp": "2025-08-14T23:57:26.422454",
+  "symbol": "AAPL",
+  "type": "news_cn"
+}

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "news_en": "Currently, there are no relevant news reports.",
+    "summary": "There are currently no recent news regarding Apple Inc. (AAPL).",
+    "key_points": []
+  },
+  "raw_text": "{\n  \"news_en\": \"Currently, there are no relevant news reports.\",\n  \"summary\": \"There are currently no recent news regarding Apple Inc. (AAPL).\",\n  \"key_points\": []\n}",
+  "timestamp": "2025-08-14T23:59:01.896766",
+  "symbol": "AAPL",
+  "type": "news_en"
+}

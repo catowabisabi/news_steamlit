@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  stock-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock-analyzer
+    restart: unless-stopped
+    ports:
+      - "8502:8502"
+    volumes:
+      # 數據持久化
+      - ./data:/app/data
+      # 配置文件（如果需要自定義）
+      - ./config.py:/app/config.py:ro
+      # 日誌目錄
+      - ./logs:/app/logs
+    environment:
+      # Streamlit配置
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_PORT=8502
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      # 時區設置
+      - TZ=Asia/Hong_Kong
+      # Python環境
+      - PYTHONUNBUFFERED=1
+      - PYTHONIOENCODING=utf-8
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8502/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - stock-analyzer-network
+    # 資源限制（根據TrueNAS Scale調整）
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # 可選：MongoDB服務（如果需要本地MongoDB）
+  # mongodb:
+  #   image: mongo:7.0
+  #   container_name: stock-analyzer-mongo
+  #   restart: unless-stopped
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo-data:/data/db
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=admin
+  #     - MONGO_INITDB_ROOT_PASSWORD=your_secure_password
+  #   networks:
+  #     - stock-analyzer-network
+
+networks:
+  stock-analyzer-network:
+    driver: bridge
+
+# volumes:
+#   mongo-data:
+#     driver: local

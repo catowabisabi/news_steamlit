@@ -1,0 +1,42 @@
+{
+  "data": {
+    "company": "XPON",
+    "ticker": "XPON",
+    "quarter": "Unknown",
+    "positive_factors": [
+      {
+        "title": "Data Absence",
+        "detail": "No available press releases or financial data to identify any positive factors, making it impossible to analyze drivers that could positively impact stock prices."
+      }
+    ],
+    "risks": [
+      {
+        "title": "Data Absence Risk",
+        "detail": "The absence of press release content and non-existent financial data leads to high uncertainty in investment assessments, potentially increasing stock price volatility risk and decision-making errors."
+      }
+    ],
+    "liquidity_risk": {
+      "cash": "Unknown",
+      "burn_rate": "Unknown",
+      "atm_risk": "Unknown",
+      "debt_status": "Unknown"
+    },
+    "summary": {
+      "short_term": "Unable to determine",
+      "mid_term": "Unable to determine",
+      "long_term": "Unable to determine"
+    },
+    "trading_recommendation": {
+      "bias": "Neutral",
+      "suggestion": "Avoid any trading decisions; advise waiting for the company to release formal financial reports or news before reassessing; monitor market dynamics for more information.",
+      "catalysts": [
+        "Potential financial report release",
+        "Company announcement updates"
+      ]
+    }
+  },
+  "raw_text": "{\n  \"company\": \"XPON\",\n  \"ticker\": \"XPON\",\n  \"quarter\": \"Unknown\",\n  \"positive_factors\": [\n    {\n      \"title\": \"Data Absence\",\n      \"detail\": \"No available press releases or financial data to identify any positive factors, making it impossible to analyze drivers that could positively impact stock prices.\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"title\": \"Data Absence Risk\",\n      \"detail\": \"The absence of press release content and non-existent financial data leads to high uncertainty in investment assessments, potentially increasing stock price volatility risk and decision-making errors.\"\n    }\n  ],\n  \"liquidity_risk\": {\n    \"cash\": \"Unknown\",\n    \"burn_rate\": \"Unknown\",\n    \"atm_risk\": \"Unknown\",\n    \"debt_status\": \"Unknown\"\n  },\n  \"summary\": {\n    \"short_term\": \"Unable to determine\",\n    \"mid_term\": \"Unable to determine\",\n    \"long_term\": \"Unable to determine\"\n  },\n  \"trading_recommendation\": {\n    \"bias\": \"Neutral\",\n    \"suggestion\": \"Avoid any trading decisions; advise waiting for the company to release formal financial reports or news before reassessing; monitor market dynamics for more information.\",\n    \"catalysts\": [\n      \"Potential financial report release\",\n      \"Company announcement updates\"\n    ]\n  }\n}",
+  "timestamp": "2025-08-15T00:11:36.103678",
+  "symbol": "XPON",
+  "type": "analysis_en"
+}

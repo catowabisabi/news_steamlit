@@ -1,0 +1,18 @@
+{
+  "data": {
+    "desc_cn": "蘋果公司設計、製造及行銷智能手機、個人電腦、平板電腦、可穿戴裝置及配件，遍及全球。公司提供iPhone系列智能手機、Mac系列個人電腦、iPad系列多功能平板電腦，以及包括AirPods、Apple TV、Apple Watch、Beats產品及HomePod的可穿戴裝置、居家產品及配件。公司還提供AppleCare支援與雲端服務，並運營多個平台，包括App Store，讓客戶發現並下載應用程式及數位內容，如書籍、音樂、影片、遊戲及播客，廣告服務則包括第三方授權安排及自有廣告平台。此外，公司提供多種訂閱制服務，如Apple Arcade（遊戲訂閱服務）、Apple Fitness+（個人化健身服務）、Apple Music（提供用戶按需收聽的廣播電台）、Apple News+（訂閱新聞和雜誌服務）、Apple TV+（提供獨家原創內容）、Apple Card（聯名信用卡）及Apple Pay（無現金支付服務），並授權其知識產權。公司服務對象涵蓋消費者、中小型企業，以及教育、企業及政府市場。公司通過App Store分發第三方應用程式，並透過零售及在線商店、直銷團隊，以及第三方行動網路運營商、批發商、零售商及轉售商銷售產品。蘋果公司成立於1976年，總部位於加州庫比蒂諾。",
+    "summary": "蘋果公司專注於設計、製造及行銷多種電子產品，並提供多樣化的訂閱服務。",
+    "business_type": "科技公司",
+    "key_products": [
+      "iPhone",
+      "Mac",
+      "iPad",
+      "Apple Watch",
+      "AirPods"
+    ]
+  },
+  "raw_text": "{\n  \"desc_cn\": \"蘋果公司設計、製造及行銷智能手機、個人電腦、平板電腦、可穿戴裝置及配件，遍及全球。公司提供iPhone系列智能手機、Mac系列個人電腦、iPad系列多功能平板電腦，以及包括AirPods、Apple TV、Apple Watch、Beats產品及HomePod的可穿戴裝置、居家產品及配件。公司還提供AppleCare支援與雲端服務，並運營多個平台，包括App Store，讓客戶發現並下載應用程式及數位內容，如書籍、音樂、影片、遊戲及播客，廣告服務則包括第三方授權安排及自有廣告平台。此外，公司提供多種訂閱制服務，如Apple Arcade（遊戲訂閱服務）、Apple Fitness+（個人化健身服務）、Apple Music（提供用戶按需收聽的廣播電台）、Apple News+（訂閱新聞和雜誌服務）、Apple TV+（提供獨家原創內容）、Apple Card（聯名信用卡）及Apple Pay（無現金支付服務），並授權其知識產權。公司服務對象涵蓋消費者、中小型企業，以及教育、企業及政府市場。公司通過App Store分發第三方應用程式，並透過零售及在線商店、直銷團隊，以及第三方行動網路運營商、批發商、零售商及轉售商銷售產品。蘋果公司成立於1976年，總部位於加州庫比蒂諾。\",\n  \"summary\": \"蘋果公司專注於設計、製造及行銷多種電子產品，並提供多樣化的訂閱服務。\",\n  \"business_type\": \"科技公司\",\n  \"key_products\": [\"iPhone\", \"Mac\", \"iPad\", \"Apple Watch\", \"AirPods\"]\n}",
+  "timestamp": "2025-08-15T01:06:41.185860",
+  "symbol": "AAPL",
+  "type": "desc_cn"
+}

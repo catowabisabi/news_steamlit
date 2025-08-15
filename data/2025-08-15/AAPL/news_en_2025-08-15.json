@@ -1,0 +1,11 @@
+{
+  "data": {
+    "news_en": "",
+    "summary": "No news content available for translation.",
+    "key_points": []
+  },
+  "raw_text": "{\n  \"news_en\": \"\",\n  \"summary\": \"No news content available for translation.\",\n  \"key_points\": []\n}",
+  "timestamp": "2025-08-15T01:08:03.545777",
+  "symbol": "AAPL",
+  "type": "news_en"
+}
