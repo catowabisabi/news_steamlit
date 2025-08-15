@@ -1,6 +1,11 @@
 # Environment variables
 .env
 
+.json
+.pdf
+news/
+data/
+
 # Python
 __pycache__/
 *.py[cod]
