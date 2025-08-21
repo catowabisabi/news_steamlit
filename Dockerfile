@@ -43,7 +43,8 @@ COPY --chown=appuser:appuser requirements.txt .
 
 # 安裝 Python 依賴（user 安裝會放到 $HOME/.local/bin）
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir streamlit
 
 # 複製應用代碼
 COPY --chown=appuser:appuser . .

@@ -4,6 +4,8 @@ services:
   
   # Streamlit Web應用
   streamlit-app:
+    env_file:
+        - .env
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,14 +34,18 @@ services:
       start_period: 40s
     networks:
       - stock-analyzer-network
-    user: "0:0"
     command: >
-      sh -c "chmod -R 777 /app/data &&
-             chmod -R 777 /app/logs &&
-             exec streamlit run run_streamlit.py --server.address=0.0.0.0 --server.port=8502 --server.headless=true --server.fileWatcherType=none --browser.gatherUsageStats=false"
+      sh -c "exec streamlit run run_streamlit.py
+             --server.address=0.0.0.0
+             --server.port=8502
+             --server.headless=true
+             --server.fileWatcherType=none
+             --browser.gatherUsageStats=false"
 
   # 自動化Worker背景服務
   auto-worker:
+    env_file:
+        - .env
     build:
       context: .
       dockerfile: Dockerfile
@@ -56,11 +62,8 @@ services:
       - PYTHONIOENCODING=utf-8
     networks:
       - stock-analyzer-network
-    user: "0:0"
     command: >
-      sh -c "chmod -R 777 /app/data &&
-             chmod -R 777 /app/logs &&
-             sleep 10 &&
+      sh -c "sleep 10 &&
              exec python start_auto_worker.py"
     depends_on:
       - streamlit-app
