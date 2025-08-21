@@ -53,8 +53,11 @@ class AutoWorker:
         self.is_running = False
         self.stop_requested = False
         
-        # 追蹤已處理的symbols（避免重複處理）
+        # 追蹤已處理的symbols（用於統計）
         self.processed_symbols = set()
+        
+        # 配置選項
+        self.force_regenerate = False  # 是否強制重新生成已存在的報告
         
         # 工作統計
         self.stats = {
@@ -145,20 +148,70 @@ class AutoWorker:
     
     def check_new_symbols(self) -> List[str]:
         """
-        檢查是否有新的symbols需要處理
+        檢查是否有新的symbols需要處理（使用與Streamlit完全相同的邏輯）
         
         Returns:
-            List[str]: 新的symbols列表
+            List[str]: 需要處理的symbols列表
         """
         current_symbols = set(self.get_today_symbols())
-        new_symbols = current_symbols - self.processed_symbols
+        today_str = datetime.now().strftime('%Y-%m-%d')
         
-        if new_symbols:
-            self.logger.info(f"🆕 發現 {len(new_symbols)} 個新symbols: {', '.join(new_symbols)}")
+        symbols_to_process = []
+        
+        for symbol in current_symbols:
+            # 使用與Streamlit完全相同的文件檢查邏輯
+            data_path = Path(self.file_manager._get_data_path(symbol, today_str))
+            md_file_path = data_path / f"{symbol}_report_{today_str}.md"
+            chinese_pdf_path = data_path / f"{symbol}_report_chinese_{today_str}.pdf"
+            english_pdf_path = data_path / f"{symbol}_report_english_{today_str}.pdf"
+            ig_file_path = data_path / f"{symbol}_ig_post_{today_str}.txt"
+            
+            # 檢查是否需要處理
+            needs_processing = False
+            
+            if self.force_regenerate:
+                # 強制重新生成模式
+                needs_processing = True
+                self.logger.debug(f"🔄 {symbol}: 強制重新生成模式")
+            else:
+                # 與Streamlit相同：檢查報告文件是否存在
+                if not (md_file_path.exists() and chinese_pdf_path.exists() and english_pdf_path.exists()):
+                    needs_processing = True
+                    self.logger.debug(f"📝 {symbol}: 缺少報告文件（MD: {md_file_path.exists()}, CN PDF: {chinese_pdf_path.exists()}, EN PDF: {english_pdf_path.exists()}）")
+                
+                # 另外檢查IG POST
+                if not ig_file_path.exists():
+                    needs_processing = True
+                    self.logger.debug(f"📱 {symbol}: 缺少IG POST文件")
+            
+            if needs_processing:
+                symbols_to_process.append(symbol)
+                
+                # 詳細日誌顯示缺少的文件
+                missing_files = []
+                if not md_file_path.exists():
+                    missing_files.append("Markdown報告")
+                if not chinese_pdf_path.exists():
+                    missing_files.append("中文PDF")
+                if not english_pdf_path.exists():
+                    missing_files.append("英文PDF")
+                if not ig_file_path.exists():
+                    missing_files.append("IG POST")
+                
+                if missing_files and not self.force_regenerate:
+                    self.logger.info(f"📋 {symbol} 缺少: {', '.join(missing_files)}")
+        
+        # 更新已處理列表（用於統計）
+        for symbol in symbols_to_process:
+            if symbol not in self.processed_symbols:
+                self.processed_symbols.add(symbol)
+        
+        if symbols_to_process:
+            self.logger.info(f"🆕 發現 {len(symbols_to_process)} 個需要處理的symbols: {', '.join(symbols_to_process)}")
         else:
-            self.logger.info("✅ 沒有發現新的symbols")
+            self.logger.info("✅ 所有symbols都已經有完整的報告和IG POST")
         
-        return list(new_symbols)
+        return symbols_to_process
     
     def process_symbol_auto(self, symbol: str) -> Dict:
         """
