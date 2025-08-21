@@ -55,5 +55,9 @@ EXPOSE 8502
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8502/_stcore/health || exit 1
 
-# 啟動命令
-CMD ["streamlit", "run", "run_streamlit.py", "--server.address", "0.0.0.0", "--server.port", "8502", "--server.headless", "true", "--server.fileWatcherType", "none", "--browser.gatherUsageStats", "false"]
+# 複製啟動腳本
+COPY --chown=appuser:appuser start_both_services.sh .
+RUN chmod +x start_both_services.sh
+
+# 啟動命令（同時運行兩個服務）
+CMD ["./start_both_services.sh"]
